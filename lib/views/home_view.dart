@@ -20,12 +20,12 @@ class HomeView extends StatelessWidget {
             ),
             body: Column(
               children: [
-                // Pass the callback to perform the search when the button is clicked
                 SearchBox(
                   controller: mySearchController.searchController,
                   onSearch: () {
-                    mySearchController
-                        .handleSearch(mySearchController.searchController.text);
+                    mySearchController.handleSearch(
+                      mySearchController.searchController.text,
+                    );
                   },
                 ),
                 Expanded(
@@ -37,7 +37,8 @@ class HomeView extends StatelessWidget {
                         title: movie.title,
                         imageUrl: movie.imageUrl ??
                             'https://via.placeholder.com/100x150',
-                        genre: movie.genre ?? 'Unknown',
+                        genre:
+                            movie.genre != null ? [movie.genre!] : ['Unknown'],
                         imdbRating: movie.imdbRating ?? 0,
                         onTap: () {
                           print('${movie.title} tapped, ${movie.imdbRating}');

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MovieTile extends StatelessWidget {
   final String title;
   final String imageUrl;
-  final String genre;
+  final List<String> genre; // Change to List<String>
   final double imdbRating;
   final VoidCallback onTap;
 
@@ -57,7 +57,7 @@ class MovieTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        genre.replaceAll(',', ' | '),
+                        genre.join(' | '), // Join the genre list here
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,

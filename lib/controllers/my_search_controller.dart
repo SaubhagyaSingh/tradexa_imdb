@@ -18,7 +18,6 @@ class MySearchController extends ChangeNotifier {
 
   Future<void> fetchInitialMovies() async {
     try {
-      // Fetch initial movies and store in allMovies and filteredMovies
       allMovies = await _movieService.fetchMovies('maze runner') ?? [];
       allMovies = await _fetchMoviesWithRatings(allMovies);
       filteredMovies = List.from(allMovies);
@@ -31,35 +30,41 @@ class MySearchController extends ChangeNotifier {
   Future<List<Movie>> _fetchMoviesWithRatings(List<Movie> movies) async {
     List<Movie> updatedMovies = [];
     for (var movie in movies) {
-      if (movie != null) {
-        try {
-          var ratedMovie = await _movieService.fetchRating(movie);
-          updatedMovies.add(ratedMovie ?? movie);
-        } catch (error) {
-          print('Failed to fetch rating for ${movie.title}: $error');
-          updatedMovies.add(movie); // Add the original movie if rating fails
-        }
+      try {
+        var ratedMovie = await _movieService.fetchRating(movie);
+        updatedMovies.add(ratedMovie ?? movie);
+      } catch (error) {
+        print('Failed to fetch rating for ${movie.title}: $error');
+        updatedMovies.add(movie);
       }
     }
     return updatedMovies;
   }
 
-  // Perform search when the search button is clicked
-  void handleSearch(String query) async {
-    if (query.isEmpty) {
+  void handleSearch(String query, {String? genreFilter}) async {
+    if (query.isEmpty && genreFilter == null) {
       filteredMovies = List.from(allMovies);
     } else if (_searchCache.containsKey(query)) {
-      // Use cached results if available
       filteredMovies = _searchCache[query]!;
+      if (genreFilter != null) {
+        filteredMovies = filteredMovies
+            .where((movie) => movie.genre!.contains(genreFilter))
+            .toList();
+      }
     } else {
       try {
         final movies = await _movieService.fetchMovies(query) ?? [];
         final moviesWithRatings = await _fetchMoviesWithRatings(movies);
-        _searchCache[query] = moviesWithRatings; // Cache the result
+        _searchCache[query] = moviesWithRatings;
         filteredMovies = moviesWithRatings;
+        if (genreFilter != null) {
+          filteredMovies = filteredMovies
+              .where((movie) => movie.genre!.contains(genreFilter))
+              .toList();
+        }
       } catch (error) {
         print('Failed to filter movies: $error');
-        filteredMovies = []; // Clear the list on error
+        filteredMovies = [];
       }
     }
     notifyListeners();

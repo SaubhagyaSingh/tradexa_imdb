@@ -3,7 +3,7 @@ class Movie {
   final String title;
   final String? imageUrl;
   final String? releaseYear;
-  final String? genre;
+  final String? genre; // This should be nullable if the genre is optional
   final double? imdbRating;
   final int? voteCount;
 
