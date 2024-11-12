@@ -52,6 +52,7 @@ class MovieTile extends StatelessWidget {
                         title,
                         style: const TextStyle(
                           fontSize: 16,
+                          fontFamily: 'Montserrat',
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -59,6 +60,7 @@ class MovieTile extends StatelessWidget {
                       Text(
                         genre.join(' | '), // Join the genre list here
                         style: const TextStyle(
+                          fontFamily: 'Montserrat',
                           fontSize: 14,
                           color: Colors.grey,
                         ),
@@ -74,6 +76,7 @@ class MovieTile extends StatelessWidget {
                         child: Text(
                           "$imdbRating IMDb",
                           style: TextStyle(
+                            fontFamily: 'Montserrat',
                             color: textColor,
                             fontWeight: FontWeight.bold,
                           ),
