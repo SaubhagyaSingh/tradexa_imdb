@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../modules/movie.dart';
 import '../services/movie_service.dart';
@@ -8,17 +9,19 @@ class MySearchController extends ChangeNotifier {
 
   List<Movie> allMovies = [];
   List<Movie> filteredMovies = [];
+  Map<String, List<Movie>> _searchCache = {}; // Caches search results
+  Timer? _debounce; // Timer for debouncing
 
   MySearchController() {
-    searchController.addListener(_onSearchChanged);
     fetchInitialMovies();
   }
 
   Future<void> fetchInitialMovies() async {
     try {
-      allMovies = await _movieService.fetchMovies('maze runner');
+      // Fetch initial movies and store in allMovies and filteredMovies
+      allMovies = await _movieService.fetchMovies('maze runner') ?? [];
       allMovies = await _fetchMoviesWithRatings(allMovies);
-      filteredMovies = allMovies;
+      filteredMovies = List.from(allMovies);
       notifyListeners();
     } catch (error) {
       print('Failed to load movies: $error');
@@ -26,25 +29,37 @@ class MySearchController extends ChangeNotifier {
   }
 
   Future<List<Movie>> _fetchMoviesWithRatings(List<Movie> movies) async {
-    for (int i = 0; i < movies.length; i++) {
-      movies[i] = await _movieService.fetchRating(movies[i]);
+    List<Movie> updatedMovies = [];
+    for (var movie in movies) {
+      if (movie != null) {
+        try {
+          var ratedMovie = await _movieService.fetchRating(movie);
+          updatedMovies.add(ratedMovie ?? movie);
+        } catch (error) {
+          print('Failed to fetch rating for ${movie.title}: $error');
+          updatedMovies.add(movie); // Add the original movie if rating fails
+        }
+      }
     }
-    return movies;
+    return updatedMovies;
   }
 
-  void _onSearchChanged() {
-    filterMovies(searchController.text);
-  }
-
-  void filterMovies(String query) async {
+  // Perform search when the search button is clicked
+  void handleSearch(String query) async {
     if (query.isEmpty) {
-      filteredMovies = allMovies;
+      filteredMovies = List.from(allMovies);
+    } else if (_searchCache.containsKey(query)) {
+      // Use cached results if available
+      filteredMovies = _searchCache[query]!;
     } else {
       try {
-        final movies = await _movieService.fetchMovies(query);
-        filteredMovies = await _fetchMoviesWithRatings(movies);
+        final movies = await _movieService.fetchMovies(query) ?? [];
+        final moviesWithRatings = await _fetchMoviesWithRatings(movies);
+        _searchCache[query] = moviesWithRatings; // Cache the result
+        filteredMovies = moviesWithRatings;
       } catch (error) {
         print('Failed to filter movies: $error');
+        filteredMovies = []; // Clear the list on error
       }
     }
     notifyListeners();
@@ -52,12 +67,14 @@ class MySearchController extends ChangeNotifier {
 
   void clearSearch() {
     searchController.clear();
-    filterMovies('');
+    filteredMovies = List.from(allMovies);
+    notifyListeners();
   }
 
   @override
   void dispose() {
     searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 }

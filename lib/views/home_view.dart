@@ -1,4 +1,3 @@
-// views/home_view.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controllers/my_search_controller.dart';
@@ -20,10 +19,12 @@ class HomeView extends StatelessWidget {
             ),
             body: Column(
               children: [
+                // Pass the callback to perform the search when the button is clicked
                 SearchBox(
                   controller: mySearchController.searchController,
-                  onChanged: (value) {
-                    mySearchController.filterMovies(value);
+                  onSearch: () {
+                    mySearchController
+                        .handleSearch(mySearchController.searchController.text);
                   },
                 ),
                 Expanded(
@@ -35,12 +36,10 @@ class HomeView extends StatelessWidget {
                         title: movie.title,
                         imageUrl: movie.imageUrl ??
                             'https://via.placeholder.com/100x150',
-                        releaseDate:
-                            movie.releaseYear ?? 'N/A', // Use releaseYear here
                         genre: movie.genre ?? 'Unknown',
                         imdbRating: movie.imdbRating ?? 0,
                         onTap: () {
-                          print('${movie.title} tapped,${movie.imdbRating}');
+                          print('${movie.title} tapped, ${movie.imdbRating}');
                         },
                       );
                     },

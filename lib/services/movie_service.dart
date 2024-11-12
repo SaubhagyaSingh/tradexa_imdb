@@ -1,14 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../global_variables.dart';
 import '../modules/movie.dart';
 
 class MovieService {
-  static const String apiUrl = 'https://imdb-com.p.rapidapi.com/search';
-  static const Map<String, String> headers = {
-    'x-rapidapi-key': '7692100ec9msheb39e6aaaa98223p11a398jsn2b37acbb9f14',
-    'x-rapidapi-host': 'imdb-com.p.rapidapi.com',
-  };
-
   Future<List<Movie>> fetchMovies(String query) async {
     final response = await http.get(
       Uri.parse('$apiUrl?searchTerm=$query'),
