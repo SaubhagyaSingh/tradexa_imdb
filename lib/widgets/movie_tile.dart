@@ -4,6 +4,8 @@ class MovieTile extends StatelessWidget {
   final String title;
   final String imageUrl;
   final String releaseDate;
+  final String genre;
+  final double imdbRating;
   final VoidCallback onTap;
 
   const MovieTile({
@@ -11,32 +13,36 @@ class MovieTile extends StatelessWidget {
     required this.title,
     required this.imageUrl,
     required this.releaseDate,
+    required this.genre,
+    required this.imdbRating,
     required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Card(
-        elevation: 3,
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                imageUrl,
-                width: 100,
-                height: 150,
-                fit: BoxFit.cover,
-              ),
+            Image.network(
+              imageUrl,
+              width: 100,
+              height: 150,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  'assets/placeholder.png',
+                  width: 100,
+                  height: 150,
+                  fit: BoxFit.cover,
+                );
+              },
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     title,
@@ -46,12 +52,9 @@ class MovieTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Release Date: $releaseDate',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                    ),
-                  ),
+                  Text("Release Date: $releaseDate"),
+                  Text("Genre: $genre"),
+                  Text("IMDb Rating: $imdbRating"),
                 ],
               ),
             ),
