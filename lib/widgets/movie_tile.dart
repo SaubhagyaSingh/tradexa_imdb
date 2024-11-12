@@ -43,7 +43,7 @@ class MovieTile extends StatelessWidget {
                 shadowColor: Colors.black26,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
-                      140, 12, 12, 12), // Extra padding on the left
+                      155, 12, 12, 12), // Extra padding on the left
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -87,7 +87,7 @@ class MovieTile extends StatelessWidget {
             // Positioned image that extends from the bottom of the container and overflows from the top
             Positioned(
               bottom: 0, // Aligns the image with the base of the card
-              left: 0,
+              left: 15,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(

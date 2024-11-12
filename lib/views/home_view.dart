@@ -14,6 +14,7 @@ class HomeView extends StatelessWidget {
       child: Consumer<MySearchController>(
         builder: (context, mySearchController, child) {
           return Scaffold(
+            backgroundColor: Colors.grey[300],
             appBar: AppBar(
               title: const Text('Home'),
             ),
