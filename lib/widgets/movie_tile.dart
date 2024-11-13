@@ -61,6 +61,7 @@ class MovieTile extends StatelessWidget {
                         genres.join(' | '), // Join the genre list here
                         style: const TextStyle(
                           fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.normal,
                           fontSize: 12,
                           color: Colors.grey,
                         ),
@@ -68,14 +69,15 @@ class MovieTile extends StatelessWidget {
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 4, vertical: 2),
                         decoration: BoxDecoration(
                           color: backgroundColor,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           "$imdbRating IMDb",
                           style: TextStyle(
+                            fontSize: 12,
                             fontFamily: 'Montserrat',
                             color: textColor,
                             fontWeight: FontWeight.bold,
