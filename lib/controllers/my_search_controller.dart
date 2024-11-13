@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import '../modules/movie.dart';
 import '../services/movie_service.dart';
@@ -9,8 +8,7 @@ class MySearchController extends ChangeNotifier {
 
   List<Movie> allMovies = [];
   List<Movie> filteredMovies = [];
-  Map<String, List<Movie>> _searchCache = {}; // Caches search results
-  Timer? _debounce; // Timer for debouncing
+  Map<String, List<Movie>> _searchCache = {}; // Cache for search results
 
   MySearchController() {
     fetchInitialMovies();
@@ -18,8 +16,8 @@ class MySearchController extends ChangeNotifier {
 
   Future<void> fetchInitialMovies() async {
     try {
-      allMovies = await _movieService.fetchMovies('maze runner') ?? [];
-      allMovies = await _fetchMoviesWithRatings(allMovies);
+      allMovies = await _movieService.fetchMovies('maze runner');
+      allMovies = await _fetchMoviesWithDetails(allMovies);
       filteredMovies = List.from(allMovies);
       notifyListeners();
     } catch (error) {
@@ -27,47 +25,46 @@ class MySearchController extends ChangeNotifier {
     }
   }
 
-  Future<List<Movie>> _fetchMoviesWithRatings(List<Movie> movies) async {
+  Future<List<Movie>> _fetchMoviesWithDetails(List<Movie> movies) async {
     List<Movie> updatedMovies = [];
     for (var movie in movies) {
       try {
-        var ratedMovie = await _movieService.fetchRating(movie);
-        updatedMovies.add(ratedMovie ?? movie);
+        // Fetch rating and genres for each movie
+        final ratedMovie = await _movieService.fetchRating(movie) ?? movie;
+        final genres = await _movieService.fetchGenres(movie.id);
+        updatedMovies.add(ratedMovie.copyWith(genres: genres));
       } catch (error) {
-        print('Failed to fetch rating for ${movie.title}: $error');
+        print('Failed to fetch details for ${movie.title}: $error');
         updatedMovies.add(movie);
       }
     }
     return updatedMovies;
   }
 
-  void handleSearch(String query, {String? genreFilter}) async {
+  Future<void> handleSearch(String query, {String? genreFilter}) async {
     if (query.isEmpty && genreFilter == null) {
       filteredMovies = List.from(allMovies);
     } else if (_searchCache.containsKey(query)) {
-      filteredMovies = _searchCache[query]!;
-      if (genreFilter != null) {
-        filteredMovies = filteredMovies
-            .where((movie) => movie.genre!.contains(genreFilter))
-            .toList();
-      }
+      filteredMovies = _filterByGenre(_searchCache[query]!, genreFilter);
     } else {
       try {
-        final movies = await _movieService.fetchMovies(query) ?? [];
-        final moviesWithRatings = await _fetchMoviesWithRatings(movies);
-        _searchCache[query] = moviesWithRatings;
-        filteredMovies = moviesWithRatings;
-        if (genreFilter != null) {
-          filteredMovies = filteredMovies
-              .where((movie) => movie.genre!.contains(genreFilter))
-              .toList();
-        }
+        final movies = await _movieService.fetchMovies(query);
+        final moviesWithDetails = await _fetchMoviesWithDetails(movies);
+        _searchCache[query] = moviesWithDetails;
+        filteredMovies = _filterByGenre(moviesWithDetails, genreFilter);
       } catch (error) {
         print('Failed to filter movies: $error');
         filteredMovies = [];
       }
     }
     notifyListeners();
+  }
+
+  List<Movie> _filterByGenre(List<Movie> movies, String? genreFilter) {
+    if (genreFilter == null) return movies;
+    return movies
+        .where((movie) => movie.genres?.contains(genreFilter) ?? false)
+        .toList();
   }
 
   void clearSearch() {
@@ -79,7 +76,6 @@ class MySearchController extends ChangeNotifier {
   @override
   void dispose() {
     searchController.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 }

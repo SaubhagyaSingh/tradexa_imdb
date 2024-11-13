@@ -37,11 +37,11 @@ class HomeView extends StatelessWidget {
                         title: movie.title,
                         imageUrl: movie.imageUrl ??
                             'https://via.placeholder.com/100x150',
-                        genre:
-                            movie.genre != null ? [movie.genre!] : ['Unknown'],
+                        genres: movie.genres ?? ['Unknown'],
                         imdbRating: movie.imdbRating ?? 0,
                         onTap: () {
-                          print('${movie.title} tapped, ${movie.imdbRating}');
+                          print(
+                              '${movie.title} tapped, ${movie.imdbRating}, ${movie.genres}');
                         },
                       );
                     },

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MovieTile extends StatelessWidget {
   final String title;
   final String imageUrl;
-  final List<String> genre; // Change to List<String>
+  final List<String> genres; // Change to List<String>
   final double imdbRating;
   final VoidCallback onTap;
 
@@ -11,7 +11,7 @@ class MovieTile extends StatelessWidget {
     Key? key,
     required this.title,
     required this.imageUrl,
-    required this.genre,
+    required this.genres,
     required this.imdbRating,
     required this.onTap,
   }) : super(key: key);
@@ -33,7 +33,7 @@ class MovieTile extends StatelessWidget {
           children: [
             // Main container with shadow
             SizedBox(
-              height: 140,
+              height: 150,
               width: double.infinity,
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -58,14 +58,14 @@ class MovieTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        genre.join(' | '), // Join the genre list here
+                        genres.join(' | '), // Join the genre list here
                         style: const TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 14,
+                          fontSize: 12,
                           color: Colors.grey,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
